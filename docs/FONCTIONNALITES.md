@@ -109,6 +109,8 @@ Tout est calculé à partir des vrais événements des journaux ADM : aucun scor
   3. il redémarre tout seul et confirme le résultat dans `alertes`.
 
   Ton `.env`, ta base et tes données ne sont jamais touchés. Si quelque chose échoue, l'ancienne version est remise en place automatiquement.
+
+  Bot hors ligne ? Sur Windows, double-clique sur `METTRE-A-JOUR` dans le dossier du bot : il fait la même chose depuis le PC.
 - Un salon supprimé par erreur est recréé par `/refresh` (sauf ceux désactivés exprès avec `/salons`).
 - Les vieux événements sont purgés chaque nuit pour garder la base légère.
 

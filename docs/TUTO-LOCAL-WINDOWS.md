@@ -202,6 +202,7 @@ Dans le dossier `C:\codex-killfeed-communaute`, **double-clique** sur :
 | **arrêter** le bot | `ARRETER-LE-BOT` |
 | le **redémarrer** | `DEMARRER-LE-BOT` |
 | voir son **journal** en direct (pour comprendre un souci) | `VOIR-LES-LOGS` |
+| le **mettre à jour** sans passer par Discord | `METTRE-A-JOUR` |
 | changer un token | ouvre `.env` avec le Bloc-notes (clic droit → *Ouvrir avec* → *Bloc-notes*), change la ligne, enregistre, puis double-clique sur `DEMARRER-LE-BOT` |
 
 > 🧒 **Le bot s'arrête de lui-même ?** S'il plante, il se relance tout seul au bout de 30 secondes. Il ne s'arrête vraiment que si tu éteins le PC, si tu fermes ta session Windows (sauf avec le démarrage à l'allumage), ou si tu double-cliques sur `ARRETER-LE-BOT`.
@@ -220,7 +221,22 @@ Quand une nouvelle version sort, le bot te prévient dans `#alertes` et dans `/d
 
 > 🧒 **En clair :** `/maj`, c'est le bouton « mettre à jour » du bot. Il fait lui-même le téléchargement, la sauvegarde et le redémarrage.
 
-**La méthode manuelle** (version plus ancienne que la 1.2, ou si `/maj` ne marche pas). Télécharge le zip ici : <https://github.com/EpSyDev/codex-killfeed-communaute/releases/latest> (fichier `codex-killfeed-communaute.zip`, dans la partie **Assets**), puis :
+**Le bot est hors ligne, ou `/maj` ne marche pas ?** Dans le dossier `C:\codex-killfeed-communaute`, double-clique sur **`METTRE-A-JOUR`**. Il fait la même chose que `/maj`, directement depuis le PC.
+
+**Ta version est trop ancienne et n'a ni `/maj` ni `METTRE-A-JOUR` ?** Une seule ligne suffit :
+
+1. Appuie en même temps sur la touche **Windows ⊞** et la touche **R** : une petite fenêtre **Exécuter** s'ouvre en bas à gauche.
+2. Colle cette ligne (clic droit → *Coller*, ou **Ctrl+V**) :
+
+   ```
+   powershell -ep bypass -c "irm https://raw.githubusercontent.com/EpSyDev/codex-killfeed-communaute/main/scripts/windows/mettre-a-jour.ps1 -OutFile $env:TEMP\maj.ps1; & $env:TEMP\maj.ps1"
+   ```
+
+3. Appuie sur **Entrée**. Une fenêtre bleue fait toute la mise à jour (1 à 3 minutes), puis affiche `[OK] Mise à jour terminée`. Appuie sur **Entrée** pour la fermer.
+
+> 🧒 **En clair :** cette ligne télécharge le programme de mise à jour officiel et le lance. Il trouve tout seul le dossier du bot, arrête le bot, sauvegarde ta base, installe la nouvelle version et relance le bot. Tes tokens et tes données ne bougent pas.
+
+**La méthode 100 % manuelle** (si rien d'autre ne marche). Télécharge le zip ici : <https://github.com/EpSyDev/codex-killfeed-communaute/releases/latest> (fichier `codex-killfeed-communaute.zip`, dans la partie **Assets**), puis :
 
 0. Double-clique sur **`ARRETER-LE-BOT`** (on ne remplace pas les fichiers d'un bot en marche).
 1. **Extrais le nouveau zip dans `C:\`**, comme à l'étape 4.
