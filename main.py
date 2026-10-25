@@ -16,14 +16,20 @@ import logging
 import os
 import sys
 
-import discord
-from discord.ext import commands
 from dotenv import load_dotenv
 
-from bot.config import load_config
-from bot.discord_queue import run_sender_worker
+from bot.config import install_root, load_config
+from bot.predeps import install_pending_deps
 
 load_dotenv()
+# Avant tout import de discord.py & co : dépendances d'une mise à jour /maj
+install_pending_deps(install_root())
+
+import discord
+from discord.ext import commands
+
+from bot.discord_queue import run_sender_worker
+
 CONFIG = load_config()
 
 # ─── Logging ──────────────────────────────────────────────────────────────────

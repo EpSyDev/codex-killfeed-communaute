@@ -4,9 +4,12 @@ Commandes ajoutées en v1.1 :
     /ban, /unban, /bans                 banlist Nitrado (admin)
     /autoban ...                        auto-bans NO PVP / suicide (admin)
     /restart ...                        redémarrages planifiés (admin)
+    /maj                                mise à jour depuis GitHub (admin)
 """
 
+import asyncio
 import logging
+import os
 from datetime import datetime, timedelta
 
 import discord
@@ -40,6 +43,60 @@ async def _require_server(interaction: discord.Interaction):
 
 def _now_hint() -> str:
     return f"Heure actuelle de la machine du bot : **{datetime.now():%H:%M}**"
+
+
+class _UpdateConfirmView(discord.ui.View):
+    def __init__(self, bot, user_id: int, release: dict, current: str):
+        super().__init__(timeout=180)
+        self.bot, self.user_id, self.release, self.current = bot, user_id, release, current
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return interaction.user.id == self.user_id
+
+    @discord.ui.button(label="Installer maintenant", style=discord.ButtonStyle.success, emoji="⬆️")
+    async def install(self, interaction: discord.Interaction, _button: discord.ui.Button):
+        from bot import updater
+        self.stop()
+        await interaction.response.edit_message(
+            content="⏳ Téléchargement et installation… (ne relance pas la commande)", embed=None, view=None)
+        try:
+            result = await updater.run_update(self.release, self.current,
+                                              requested_by=str(interaction.user.id),
+                                              channel_id=str(interaction.channel_id))
+        except updater.UpdateError as e:
+            await interaction.edit_original_response(content=f"❌ {e}\nRien n'a été modifié, le bot continue en **{self.current}**.")
+            return
+        except Exception as e:
+            logger.error(f"[MAJ] Échec inattendu : {e}", exc_info=True)
+            await interaction.edit_original_response(
+                content=f"❌ Erreur inattendue : {e}\nDétail dans `data/logs/bot.log`. "
+                        "Ancienne version sauvegardée dans `data/updates/`.")
+            return
+
+        msg = (f"✅ Version **{self.release['tag']}** installée. Le bot redémarre : il revient en ligne "
+               "dans 1 à 2 minutes et confirme dans #alertes.")
+        if result.get("deps_changed"):
+            msg += "\nℹ️ De nouvelles dépendances s'installent au redémarrage : compte quelques minutes de plus."
+        if result.get("launcher_changed"):
+            msg += ("\n⚠️ Le lanceur Windows a changé : à l'occasion, double-clique sur "
+                    "`INSTALLER-WINDOWS` pour l'actualiser (rien n'est perdu).")
+        await interaction.edit_original_response(content=msg)
+        asyncio.get_running_loop().create_task(_restart_bot(self.bot))
+
+    @discord.ui.button(label="Annuler", style=discord.ButtonStyle.secondary)
+    async def cancel(self, interaction: discord.Interaction, _button: discord.ui.Button):
+        self.stop()
+        await interaction.response.edit_message(content="Mise à jour annulée.", embed=None, view=None)
+
+
+async def _restart_bot(bot) -> None:
+    """Quitte le process : la boucle Windows / systemd relance la nouvelle version."""
+    await asyncio.sleep(3)
+    logger.info("[MAJ] Redémarrage pour terminer la mise à jour")
+    try:
+        await asyncio.wait_for(bot.close(), timeout=10)
+    finally:
+        os._exit(0)
 
 
 class ExtraCommands(commands.Cog):
@@ -267,6 +324,44 @@ class ExtraCommands(commands.Cog):
         slots = "\n".join(f"• {mod.describe_days(s['days'])} de {s['start']} à {s['end']}" for s in sched["slots"])
         active = "actif" if mod.nopvp_active_now(gid) else "inactif"
         return f"🕒 Plages NO PVP :\n{slots}\nEn ce moment : **{active}**. {_now_hint()}"
+
+    # ── /maj ──────────────────────────────────────────────────────────────────
+
+    @app_commands.command(name="maj", description="Installe la dernière version du bot (config et données conservées)")
+    @app_commands.default_permissions(administrator=True)
+    async def maj(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        from bot import updater
+        from bot.tasks import maintenance as mt
+        if updater.is_running():
+            await interaction.followup.send("⏳ Une mise à jour est déjà en cours.", ephemeral=True)
+            return
+        if not mt.UPDATE_REPO:
+            await interaction.followup.send("La vérification des mises à jour est désactivée sur cette installation.", ephemeral=True)
+            return
+        await mt.check_version()
+        current = mt.current_version()
+        rel = mt.update_available()
+        if not mt.latest_release.get("tag"):
+            await interaction.followup.send("❌ Impossible de joindre GitHub pour l'instant. Réessaie dans quelques minutes.", ephemeral=True)
+            return
+        if not rel:
+            await interaction.followup.send(f"✅ Le bot est à jour (version **{current}**).", ephemeral=True)
+            return
+
+        embed = discord.Embed(
+            title=f"⬆️ Mise à jour {current} → {rel['tag']}",
+            description=((rel.get("notes") or "")[:3000] + f"\n\n[Détail de la version]({rel['url']})"),
+            color=0x3B82F6,
+        )
+        embed.add_field(name="Ce qui va se passer", inline=False, value=(
+            "1. téléchargement et vérification du fichier officiel\n"
+            "2. sauvegarde de la base et de la version actuelle\n"
+            "3. remplacement des fichiers (`.env`, base et données **conservés**)\n"
+            "4. redémarrage du bot : **1 à 2 minutes hors ligne**\n"
+            "Le résultat est confirmé dans #alertes."))
+        await interaction.followup.send(embed=embed, view=_UpdateConfirmView(self.bot, interaction.user.id, rel, current),
+                                        ephemeral=True)
 
     # ── /restart ──────────────────────────────────────────────────────────────
 

@@ -102,7 +102,13 @@ Tout est calculé à partir des vrais événements des journaux ADM : aucun scor
 ### 🧰 Entretien automatique
 
 - **Sauvegarde quotidienne** de la base du bot dans `data/backups` (les 7 derniers jours sont gardés).
-- **Version** affichée dans `/diagnostic`. Le bot vérifie une fois par jour les [versions publiées](https://github.com/EpSyDev/codex-killfeed-communaute/releases) : quand une nouvelle sort, `/diagnostic` et `alertes` le signalent (une seule fois), avec le lien de téléchargement.
+- **Version** affichée dans `/diagnostic`. Le bot vérifie une fois par jour les [versions publiées](https://github.com/EpSyDev/codex-killfeed-communaute/releases) : quand une nouvelle sort, `/diagnostic` et `alertes` le signalent (une seule fois).
+- **Mise à jour en un clic** avec `/maj` :
+  1. le bot télécharge la version officielle et vérifie son empreinte ;
+  2. il sauvegarde la base et la version actuelle, puis remplace ses fichiers ;
+  3. il redémarre tout seul et confirme le résultat dans `alertes`.
+
+  Ton `.env`, ta base et tes données ne sont jamais touchés. Si quelque chose échoue, l'ancienne version est remise en place automatiquement.
 - Un salon supprimé par erreur est recréé par `/refresh` (sauf ceux désactivés exprès avec `/salons`).
 - Les vieux événements sont purgés chaque nuit pour garder la base légère.
 
@@ -151,6 +157,7 @@ Entre `< >` : paramètre **obligatoire**. Entre `[ ]` : paramètre **facultatif*
 | `/diagnostic` | 🔒 | Bilan de santé : Discord, base de données, token Nitrado, KillFeed, version, dernière sauvegarde, heure de la machine. **La commande à lancer en premier en cas de souci.** |
 | `/status` | 👥 | Statut du KillFeed. |
 | `/stop` | 🔒 | Arrête le KillFeed sur ce serveur Discord (relance avec `/setup`). |
+| `/maj` | 🔒 | Installe la dernière version du bot en un clic : téléchargement, vérification, sauvegarde, redémarrage (1 à 2 minutes hors ligne). Configuration et données conservées. Le résultat est confirmé dans `alertes`. |
 | `/purge-guild` | 🔒 | ⚠️ Supprime **définitivement** les données du bot pour ce serveur Discord (historique, réglages). Demande confirmation. |
 
 ### 🛡️ Whitelist

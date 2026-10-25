@@ -214,8 +214,15 @@ Dans le dossier `C:\codex-killfeed-communaute`, **double-clique** sur :
 
 ## 9. Mettre à jour
 
-Quand une nouvelle version sort, le bot te prévient dans `#alertes` et dans `/diagnostic`. Toutes les versions se téléchargent ici : <https://github.com/EpSyDev/codex-killfeed-communaute/releases/latest> (fichier `codex-killfeed-communaute.zip`, dans la partie **Assets**).
+Quand une nouvelle version sort, le bot te prévient dans `#alertes` et dans `/diagnostic`.
 
+**La méthode simple (à partir de la version 1.2) :** sur Discord, tape **`/maj`**, puis clique sur **Installer maintenant**. Le bot se met à jour tout seul, redémarre et confirme dans `#alertes` (1 à 2 minutes hors ligne). Tes réglages et tes données sont conservés.
+
+> 🧒 **En clair :** `/maj`, c'est le bouton « mettre à jour » du bot. Il fait lui-même le téléchargement, la sauvegarde et le redémarrage.
+
+**La méthode manuelle** (version plus ancienne que la 1.2, ou si `/maj` ne marche pas). Télécharge le zip ici : <https://github.com/EpSyDev/codex-killfeed-communaute/releases/latest> (fichier `codex-killfeed-communaute.zip`, dans la partie **Assets**), puis :
+
+0. Double-clique sur **`ARRETER-LE-BOT`** (on ne remplace pas les fichiers d'un bot en marche).
 1. **Extrais le nouveau zip dans `C:\`**, comme à l'étape 4.
 2. Windows demande ce qu'il faut faire des fichiers qui existent déjà : clique sur **Remplacer les fichiers dans la destination**.
 3. Double-clique sur **`INSTALLER-WINDOWS`**.

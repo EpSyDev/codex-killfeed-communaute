@@ -79,10 +79,16 @@ async def check_version() -> None:
             logger.debug(f"[Version] GitHub HTTP {r.status_code}")
             return
         data = r.json()
+        # Le zip publié en pièce jointe de la release (utilisé par /maj)
+        asset = next((a for a in data.get("assets", [])
+                      if a.get("name") == "codex-killfeed-communaute.zip"), {})
         latest_release.update({
             "tag":     data.get("tag_name", ""),
             "url":     data.get("html_url", ""),
             "notes":   (data.get("body") or "")[:900],
+            "zip_url": asset.get("browser_download_url", ""),
+            "zip_size": asset.get("size", 0),
+            "digest":  asset.get("digest") or "",   # "sha256:…" calculé par GitHub
             "checked": datetime.now().isoformat(timespec="minutes"),
         })
     except Exception as e:
@@ -100,8 +106,10 @@ async def _notify_update(bot) -> None:
         embed = discord.Embed(
             title=f"⬆️ Nouvelle version disponible : {rel['tag']}",
             description=(f"Version installée : **{current_version()}**\n"
-                         f"[Télécharger la nouvelle version]({rel['url']})\n\n"
-                         + (rel["notes"] or "")),
+                         "👉 Pour l'installer : tape **`/maj`** (environ 1 minute, "
+                         "configuration et données conservées).\n"
+                         f"[Voir le détail de la version]({rel['url']})\n\n"
+                         + (rel["notes"] or ""))[:4000],
             color=0x3B82F6,
         )
         await send_alert(bot, cfg, embed)
@@ -160,8 +168,40 @@ async def _weekly_top(bot) -> None:
 
 # ─── Boucle ───────────────────────────────────────────────────────────────────
 
+async def _confirm_update(bot) -> None:
+    """Après un /maj : confirme (ou signale l'échec) dans #alertes, une fois."""
+    from bot import updater
+    from bot.predeps import FAILURE_NAME
+    pending = updater.pop_pending()
+    failure = load_config().data_dir / "updates" / FAILURE_NAME
+    detail = ""
+    if failure.exists():
+        detail = failure.read_text(encoding="utf-8", errors="replace")[-500:]
+        failure.unlink(missing_ok=True)
+    if not pending and not detail:
+        return
+    ok = not detail and current_version() == pending.get("to")
+    embed = discord.Embed(
+        title=f"✅ Mise à jour installée : {current_version()}" if ok else "❌ Mise à jour annulée",
+        description=(
+            f"Passage de **{pending.get('from', '?')}** à **{current_version()}** réussi. "
+            "Le bot fonctionne normalement."
+            if ok else
+            "L'installation des dépendances a échoué : l'ancienne version a été remise en place, "
+            f"le bot fonctionne normalement en **{current_version()}**.\n```{detail[-900:]}```"
+        ),
+        color=0x22C55E if ok else 0xEF4444,
+    )
+    for cfg in db.get_all_active_servers():
+        await send_alert(bot, cfg, embed.copy())
+
+
 async def run_maintenance(bot) -> None:
     await bot.wait_until_ready()
+    try:
+        await _confirm_update(bot)
+    except Exception as e:
+        logger.error(f"[MAJ] Confirmation : {e}")
     last_version_check: Optional[str] = None
     while not bot.is_closed():
         try:

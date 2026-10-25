@@ -291,7 +291,11 @@ Dans `nano` : modifie la ligne voulue, puis **Ctrl+O**, **Entrée** pour enregis
 
 ## 8. Mettre à jour
 
-Quand une nouvelle version sort, le bot te prévient dans `#alertes` et dans `/diagnostic`. Télécharge le zip ici, dans ton dossier **Téléchargements** : <https://github.com/EpSyDev/codex-killfeed-communaute/releases/latest> (fichier `codex-killfeed-communaute.zip`, dans la partie **Assets**). Puis :
+Quand une nouvelle version sort, le bot te prévient dans `#alertes` et dans `/diagnostic`.
+
+**La méthode simple (à partir de la version 1.2) :** sur Discord, tape **`/maj`**, puis clique sur **Installer maintenant**. Le bot se met à jour tout seul, redémarre et confirme dans `#alertes` (1 à 2 minutes hors ligne). Rien à faire sur le VPS.
+
+**La méthode manuelle** (version plus ancienne que la 1.2, ou si `/maj` ne marche pas). Télécharge le zip ici, dans ton dossier **Téléchargements** : <https://github.com/EpSyDev/codex-killfeed-communaute/releases/latest> (fichier `codex-killfeed-communaute.zip`, dans la partie **Assets**). Puis :
 
 ```powershell
 # sur ton PC

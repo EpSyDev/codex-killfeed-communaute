@@ -13,9 +13,9 @@ Créé par **EpSy** et offert à la communauté DayZ francophone.
 - **Surveillance** : salon vocal « 🟢 En-Ligne • 12/60 » mis à jour toutes les 5 minutes ; alerte dans `#alertes` (salon réservé aux admins) si le serveur tombe ou si les logs ADM ne bougent plus alors que des joueurs sont connectés.
 - **Modération** : `/ban`, `/unban`, `/bans` directement sur la banlist Nitrado ; auto-ban NO PVP (avec plages horaires) et auto-ban suicide via `/autoban`, avec liste d'exceptions.
 - **Redémarrages planifiés** : `/restart planifier 06:00`, compte à rebours à 15, 5 et 1 minute dans `#annonces`, `/restart maintenant` pour un redémarrage ponctuel.
-- **Entretien automatique** : sauvegarde quotidienne de la base dans `data/backups` (7 jours gardés), version affichée et nouvelles versions signalées dans `/diagnostic`.
+- **Entretien automatique** : sauvegarde quotidienne de la base dans `data/backups` (7 jours gardés), nouvelles versions signalées, et **mise à jour en un clic avec `/maj`**.
 - **Salons optionnels** via `/salons` : constructions, placements, drapeaux, logs-whitelist, alertes, annonces, statistiques.
-- **Commandes** : `/setup`, `/salons`, `/filter`, `/status`, `/kills`, `/stats`, `/joueur`, `/top`, `/ban`, `/unban`, `/bans`, `/autoban`, `/restart`, `/diagnostic`, `/stop`, `/purge-guild`.
+- **Commandes** : `/setup`, `/salons`, `/filter`, `/status`, `/kills`, `/stats`, `/joueur`, `/top`, `/ban`, `/unban`, `/bans`, `/autoban`, `/restart`, `/maj`, `/diagnostic`, `/stop`, `/purge-guild`.
 
 Les horaires (NO PVP, redémarrages, classement du dimanche) suivent l'horloge de la machine qui fait tourner le bot : `/diagnostic` l'affiche.
 
@@ -59,3 +59,7 @@ scripts/update.sh    mise à jour en gardant config et données
 scripts/windows/     installation sur PC Windows (lancée par INSTALLER-WINDOWS.bat)
 .env.example         modèle de configuration
 ```
+
+## Licence
+
+[MIT](LICENSE) © EpSy : tu peux utiliser, modifier et partager ce bot librement, à condition de garder la mention de licence et le nom de l'auteur.
