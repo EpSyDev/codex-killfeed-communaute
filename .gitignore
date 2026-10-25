@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.db
+*.db-journal
+.env
+data/
+*.db-wal
+*.db-shm
+*.tmp
+scripts/windows/lancer-bot.vbs
